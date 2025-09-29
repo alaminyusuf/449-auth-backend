@@ -3,8 +3,7 @@ const dotenv = require('dotenv')
 const OTP = require('../models/OTP') // Import the Mongoose model
 
 dotenv.config('../')
-const check = process.env.EMAIL_USER
-console.log(check)
+
 // --- Email Transporter Setup ---
 const transporter = nodemailer.createTransport({
 	service: 'gmail',
