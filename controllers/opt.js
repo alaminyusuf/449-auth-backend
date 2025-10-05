@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer')
 const dotenv = require('dotenv')
-const OTP = require('../models/OTP') // Import the Mongoose model
+const OTP = require('../models/OTP')
+const jwt = require('jsonwebtoken')
 
 dotenv.config('../')
 
@@ -27,10 +28,8 @@ function generateOTP(length = 6) {
  * Generates an OTP, stores it in MongoDB, and emails it.
  */
 exports.sendOTPEmail = async (req, res) => {
-	const { email } = req.body
-	if (!email) {
-		return res.status(400).json({ message: 'Email is required.' })
-	}
+	const token = req.headers.authorization.split(' ')[1]
+	const { email } = jwt.decode(token)
 
 	try {
 		const otp = generateOTP(6)
@@ -52,7 +51,6 @@ exports.sendOTPEmail = async (req, res) => {
 
 		// 4. Send the email
 		await transporter.sendMail(mailOptions)
-		console.log(`OTP sent successfully to ${email}`)
 
 		res.status(200).json({ message: 'OTP sent successfully to email.' })
 	} catch (error) {
@@ -67,15 +65,16 @@ exports.sendOTPEmail = async (req, res) => {
  * Verifies the user-provided OTP against the stored one in MongoDB.
  */
 exports.verifyOTP = async (req, res) => {
-	const { email, otp } = req.body
-	if (!email || !otp) {
+	const token = req.headers.authorization.split(' ')[1]
+	const { email } = jwt.decode(token)
+	const { otp } = req.body
+	if (!otp) {
 		return res.status(400).json({ message: 'Email and OTP are required.' })
 	}
 
 	try {
 		// 1. Find the OTP in the database
 		const storedOTP = await OTP.findOne({ email, otp })
-
 		if (!storedOTP) {
 			// This covers invalid OTP or an expired OTP (due to the TTL index)
 			return res.status(401).json({ message: 'Invalid or expired OTP.' })
@@ -84,12 +83,20 @@ exports.verifyOTP = async (req, res) => {
 		// 2. Consume the OTP immediately after successful use
 		await OTP.deleteOne({ _id: storedOTP._id })
 
-		// 3. Success
-		res.status(200).json({ message: 'OTP verified successfully.' })
+		const payload = { email }
+
+		// 3. Success and Send JWT token
+		jwt.sign(
+			payload,
+			'YOUR_SECRET_KEY',
+			{ expiresIn: '1h' },
+			(err, token) => {
+				if (err) throw err
+				res.status(201).json({ token, message: 'Verification successful' })
+			}
+		)
 	} catch (error) {
 		console.error('Error in verifyOTP:', error)
-		res
-			.status(500)
-			.json({ message: 'Internal server error during verification.' })
+		res.status(500).json({ error })
 	}
 }
