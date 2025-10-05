@@ -1,16 +1,12 @@
 // controllers/otpController.js
 const nodemailer = require('nodemailer')
-const mongoose = require('mongoose')
-const bcrypt = require('bcryptjs') // Needed for hashing the new password
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
 const dotenv = require('dotenv')
 const OTP = require('../models/OTP')
-const User = require('../models/User') // 🚨 IMPORTANT: You need a User model defined
+const User = require('../models/User')
 
 dotenv.config('../')
-
-// --- Database Connection (Assuming defined in server.js or here) ---
-// Note: Ensure your User model is imported and defined (e.g., in models/User.js)
-// In a real app, User model would have 'email' and 'password' fields.
 
 // --- Email Transporter Setup ---
 const transporter = nodemailer.createTransport({
@@ -68,7 +64,6 @@ exports.forgotPassword = async (req, res) => {
 
 		// 4. Send the email
 		await transporter.sendMail(mailOptions)
-		console.log(`Password reset OTP sent successfully to ${email}`)
 
 		res
 			.status(200)
@@ -87,9 +82,11 @@ exports.forgotPassword = async (req, res) => {
 // ---------------------------------------------------------------------
 
 exports.resetPassword = async (req, res) => {
-	const { email, otp, newPassword } = req.body
+	const token = req.headers.authorization.split(' ')[1]
+	const { email } = jwt.decode(token)
+	const { otp, newPassword } = req.body
 
-	if (!email || !otp || !newPassword) {
+	if (!otp || !newPassword) {
 		return res
 			.status(400)
 			.json({ message: 'Email, OTP, and new password are required.' })
