@@ -1,8 +1,6 @@
-const User = require('../models/User') // Assume path
 const bcrypt = require('bcryptjs')
+const User = require('../models/User')
 const jwt = require('jsonwebtoken')
-
-const JWT_SECRET = 'YOUR_SECRET_KEY' // MUST be secured in .env in production
 
 // @route POST /api/auth/register
 exports.register = async (req, res) => {
@@ -12,7 +10,7 @@ exports.register = async (req, res) => {
 		// 1. Check if user already exists
 		let user = await User.findOne({ email })
 		if (user) {
-			return res.status(400).json({ msg: 'User already exists' })
+			return res.status(400).json({ message: 'User already exists' })
 		}
 
 		user = new User({ username, email, password })
@@ -24,21 +22,10 @@ exports.register = async (req, res) => {
 		// 3. Save User
 		await user.save()
 
-		// 4. Create and return JWT (optional for registration, but common)
-		const payload = { user: { id: user.id } }
-
-		jwt.sign(
-			payload,
-			'YOUR_SECRET_KEY',
-			{ expiresIn: '1h' },
-			(err, token) => {
-				if (err) throw err
-				res.status(201).json({ token, msg: 'Registration successful' })
-			}
-		)
+		res.status(201).json({ message: 'Registration successful' })
 	} catch (err) {
 		console.error(err.message)
-		res.status(500).send('Server error')
+		res.status(500).send({ message: err.message })
 	}
 }
 // ---------------------------
@@ -52,44 +39,30 @@ exports.login = async (req, res) => {
 		// 1. Check for user existence
 		const user = await User.findOne({ email })
 		if (!user) {
-			return res.status(400).json({ msg: 'Invalid Credentials' })
+			return res
+				.status(400)
+				.json({ message: 'Invalid Credentials, Not Found' })
 		}
 
 		// 2. Compare passwords
 		const isMatch = await bcrypt.compare(password, user.password)
 		if (!isMatch) {
-			return res.status(400).json({ msg: 'Invalid Credentials' })
+			return res.status(400).send({ message: 'Invalid Credentials' })
 		}
 
-		// 3. Check for 2FA status
-		if (user.isTwoFactorEnabled) {
-			// Initiate 2FA verification flow
-			return res.json({
-				msg: '2FA required',
-				twoFactorEnabled: true,
-				// You might send a temporary token here to identify the user for 2FA step
-				// A better approach is often to use the email in the next step.
-			})
-		}
-
-		// 4. Generate and return JWT (Standard Login Success)
-		const payload = { user: { id: user.id } }
+		const payload = { email }
 
 		jwt.sign(
 			payload,
 			'YOUR_SECRET_KEY',
-			{ expiresIn: '1h' },
+			{ expiresIn: '10m' },
 			(err, token) => {
 				if (err) throw err
-				res.json({
-					token,
-					twoFactorEnabled: false,
-					msg: 'Login successful',
-				})
+				res.status(201).json({ token, message: 'Registration successful' })
 			}
 		)
 	} catch (err) {
 		console.error(err.message)
-		res.status(500).send('Server error')
+		res.status(500).json({ message: err.message })
 	}
 }
