@@ -4,12 +4,13 @@ const router = express.Router()
 const authController = require('./auth')
 const passwordController = require('../controllers/password')
 const otpController = require('../controllers/opt')
+const protected = require('../middleware/auth')
 
-router.post('/register', authController.register)
-router.post('/login', authController.login)
-router.post('/send-otp', otpController.sendOTPEmail)
-router.post('/verify-otp', otpController.verifyOTP)
+router.post('/auth/register', authController.register)
+router.post('/auth/login', authController.login)
+router.post('/send-otp', protected, otpController.sendOTPEmail)
+router.post('/verify-otp', protected, otpController.verifyOTP)
 router.post('/forgot-password', passwordController.forgotPassword)
-router.post('/reset-password', passwordController.resetPassword)
+router.post('/reset-password', protected, passwordController.resetPassword)
 
 module.exports = router
