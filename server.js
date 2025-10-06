@@ -11,6 +11,9 @@ app.use(cors({ origin: true }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use('/api', apiRoutes)
-app.use('/.netlify/functions/api', router)
+
+app.get('/', (req, res) => {
+	res.status(200).json({ data: 'Hello Wolrd' })
+})
 
 module.exports = app
