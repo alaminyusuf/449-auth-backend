@@ -16,10 +16,6 @@ const UserSchema = new mongoose.Schema({
 		required: true,
 	},
 	// 2FA Fields
-	isTwoFactorEnabled: {
-		type: Boolean,
-		default: false,
-	},
 	twoFactorSecret: {
 		type: String,
 		default: null,

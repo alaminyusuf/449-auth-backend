@@ -2,11 +2,8 @@
 const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
-const dotenv = require('dotenv')
 const OTP = require('../models/OTP')
 const User = require('../models/User')
-
-dotenv.config('../')
 
 // --- Email Transporter Setup ---
 const transporter = nodemailer.createTransport({
@@ -69,7 +66,6 @@ exports.forgotPassword = async (req, res) => {
 			.status(200)
 			.json({ message: 'Password reset code sent to your email.' })
 	} catch (error) {
-		console.error('Error in forgotPassword:', error)
 		res.status(500).json({
 			message: 'Failed to initiate password reset.',
 			error: error.message,

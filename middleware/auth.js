@@ -20,7 +20,7 @@ module.exports = function (req, res, next) {
 	try {
 		// 3. Verify token
 		// Use the same JWT_SECRET used during login/registration
-		const decoded = jwt.verify(token, 'YOUR_SECRET_KEY')
+		const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
 		// 4. Attach user data to request object
 		// The payload we signed was { user: { id: user.id } }

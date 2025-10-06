@@ -1,15 +1,11 @@
 const mongoose = require('mongoose')
 
-// Get MongoDB connection URI from environment variables
-const MONGO_URI =
-	process.env.MONGO_URI || 'mongodb://localhost:27017/twoFactor'
-
 /**
  * Connects to the MongoDB database.
  */
 const connectDB = async () => {
 	try {
-		mongoose.connect(MONGO_URI)
+		mongoose.connect(process.env.MONGO_URI)
 		const connection = mongoose.connection
 
 		connection.on('connected', () => {

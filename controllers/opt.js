@@ -1,9 +1,6 @@
 const nodemailer = require('nodemailer')
-const dotenv = require('dotenv')
 const OTP = require('../models/OTP')
 const jwt = require('jsonwebtoken')
-
-dotenv.config('../')
 
 // --- Email Transporter Setup ---
 const transporter = nodemailer.createTransport({
@@ -88,7 +85,7 @@ exports.verifyOTP = async (req, res) => {
 		// 3. Success and Send JWT token
 		jwt.sign(
 			payload,
-			'YOUR_SECRET_KEY',
+			process.env.JWT_SECRET,
 			{ expiresIn: '1h' },
 			(err, token) => {
 				if (err) throw err
