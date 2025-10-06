@@ -13,4 +13,4 @@ app.use(express.urlencoded({ extended: true }))
 app.use('/api', apiRoutes)
 app.use('/.netlify/functions/api', router)
 
-module.exports.handler = serverless(app)
+module.exports = app
