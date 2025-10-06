@@ -22,10 +22,9 @@ exports.register = async (req, res) => {
 		// 3. Save User
 		await user.save()
 
-		res.status(201).json({ message: 'Registration successful' })
+		return res.status(201).json({ message: 'Registration successful' })
 	} catch (err) {
-		console.error(err.message)
-		res.status(500).send({ message: err.message })
+		return res.status(500).send({ message: err.message })
 	}
 }
 // ---------------------------
@@ -58,11 +57,10 @@ exports.login = async (req, res) => {
 			{ expiresIn: '10m' },
 			(err, token) => {
 				if (err) throw err
-				res.status(201).json({ token, message: 'Registration successful' })
+				return res.status(201).json({ token, message: 'Login successful' })
 			}
 		)
 	} catch (err) {
-		console.error(err.message)
-		res.status(500).json({ message: err.message })
+		return res.status(500).json({ message: err.message })
 	}
 }

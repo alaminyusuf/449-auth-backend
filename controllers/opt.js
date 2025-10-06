@@ -1,6 +1,8 @@
 const nodemailer = require('nodemailer')
 const OTP = require('../models/OTP')
 const jwt = require('jsonwebtoken')
+const dotenv = require('dotenv')
+dotenv.config()
 
 // --- Email Transporter Setup ---
 const transporter = nodemailer.createTransport({
@@ -66,7 +68,7 @@ exports.verifyOTP = async (req, res) => {
 	const { email } = jwt.decode(token)
 	const { otp } = req.body
 	if (!otp) {
-		return res.status(400).json({ message: 'Email and OTP are required.' })
+		return res.status(400).json({ message: 'OTP is required.' })
 	}
 
 	try {
