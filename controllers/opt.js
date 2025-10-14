@@ -49,7 +49,7 @@ exports.sendOTPEmail = async (req, res) => {
 		}
 
 		// 4. Send the email
-		await transporter.sendMail(mailOptions)
+		// await transporter.sendMail(mailOptions)
 
 		res.status(200).json({ message: 'OTP sent successfully to email.' })
 	} catch (error) {
@@ -88,7 +88,7 @@ exports.verifyOTP = async (req, res) => {
 		jwt.sign(
 			payload,
 			process.env.JWT_SECRET,
-			{ expiresIn: '1h' },
+			{ expiresIn: '1d' },
 			(err, token) => {
 				if (err) throw err
 				res.status(201).json({ token, message: 'Verification successful' })
