@@ -39,8 +39,8 @@ exports.forgotPassword = async (req, res) => {
 		const user = await User.findOne({ email })
 		if (!user) {
 			// Send a success message even if the user doesn't exist to prevent enumeration
-			return res.status(200).json({
-				message: 'If an account exists, a reset code has been sent.',
+			return res.status(202).json({
+				message: 'Email not found',
 			})
 		}
 
@@ -62,9 +62,20 @@ exports.forgotPassword = async (req, res) => {
 		// 4. Send the email
 		await transporter.sendMail(mailOptions)
 
-		res
-			.status(200)
-			.json({ message: 'Password reset code sent to your email.' })
+		const payload = { email }
+
+		jwt.sign(
+			payload,
+			process.env.JWT_SECRET,
+			{ expiresIn: '10m' },
+			(err, token) => {
+				if (err) throw err
+				return res.status(201).json({
+					token,
+					message: 'Password reset code sent to your email',
+				})
+			}
+		)
 	} catch (error) {
 		res.status(500).json({
 			message: 'Failed to initiate password reset.',
@@ -78,10 +89,7 @@ exports.forgotPassword = async (req, res) => {
 // ---------------------------------------------------------------------
 
 exports.resetPassword = async (req, res) => {
-	const token = req.headers.authorization.split(' ')[1]
-	const { email } = jwt.decode(token)
-	const { otp, newPassword } = req.body
-
+	const { otp, newPassword, email } = req.body
 	if (!otp || !newPassword) {
 		return res
 			.status(400)
@@ -120,7 +128,8 @@ exports.resetPassword = async (req, res) => {
 
 		// 5. Success
 		res.status(200).json({
-			message: 'Password has been successfully reset. Please log in.',
+			message:
+				'Password has been successfully reset. Please proceed to login.',
 		})
 	} catch (error) {
 		console.error('Error in resetPassword:', error)
