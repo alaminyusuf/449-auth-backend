@@ -73,7 +73,6 @@ exports.paySalaries = async (req, res) => {
 			summary: paymentResults,
 		})
 	} catch (error) {
-		console.error(error)
 		res
 			.status(500)
 			.json({ message: 'Error processing payroll.', error: error.message })

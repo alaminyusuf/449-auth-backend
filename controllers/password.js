@@ -132,7 +132,6 @@ exports.resetPassword = async (req, res) => {
 				'Password has been successfully reset. Please proceed to login.',
 		})
 	} catch (error) {
-		console.error('Error in resetPassword:', error)
 		res
 			.status(500)
 			.json({ message: 'Internal server error during password reset.' })

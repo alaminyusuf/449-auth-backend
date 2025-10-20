@@ -15,7 +15,6 @@ exports.addIncome = async (req, res) => {
 		await income.save()
 		res.json({ message: 'Income added' })
 	} catch (error) {
-		console.error(error)
 		res.status(500).json({ message: error })
 	}
 }
@@ -100,7 +99,6 @@ exports.getSummary = async (req, res) => {
 		// 4. Send the calculated summary
 		res.status(200).json({ totalIncome, totalExpenses })
 	} catch (error) {
-		console.error(error)
 		res.status(500).json({ message: 'Server error' })
 	}
 }
@@ -149,7 +147,6 @@ exports.getTransactions = async (req, res) => {
 		// The client-side logic will combine and display this data
 		res.status(200).json({ income, expenses })
 	} catch (error) {
-		console.error('Error fetching user transactions:', error)
 		res.status(500).json({ message: 'Server error fetching transactions' })
 	}
 }
