@@ -65,7 +65,7 @@ exports.sendOTPEmail = async (req, res) => {
  */
 exports.verifyOTP = async (req, res) => {
 	const token = req.headers.authorization.split(' ')[1]
-	const { email } = jwt.decode(token)
+	const { email, role } = jwt.decode(token)
 	const { otp } = req.body
 	if (!otp) {
 		return res.status(400).json({ message: 'OTP is required.' })
@@ -82,7 +82,7 @@ exports.verifyOTP = async (req, res) => {
 		// 2. Consume the OTP immediately after successful use
 		await OTP.deleteOne({ _id: storedOTP._id })
 
-		const payload = { email }
+		const payload = { email, role }
 
 		// 3. Success and Send JWT token
 		jwt.sign(
@@ -91,11 +91,12 @@ exports.verifyOTP = async (req, res) => {
 			{ expiresIn: '1d' },
 			(err, token) => {
 				if (err) throw err
-				res.status(201).json({ token, message: 'Verification successful' })
+				res
+					.status(201)
+					.json({ token, message: 'Verification successful', role })
 			}
 		)
 	} catch (error) {
-		console.error('Error in verifyOTP:', error)
-		res.status(500).json({ error })
+		res.status(500).json({ message: 'Server Error' })
 	}
 }
