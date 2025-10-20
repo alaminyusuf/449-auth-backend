@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs')
-const User = require('../models/User')
+const Admin = require('../models/Admin')
 const jwt = require('jsonwebtoken')
 
 // @route POST /api/auth/register
@@ -36,20 +36,27 @@ exports.login = async (req, res) => {
 
 	try {
 		// 1. Check for user existence
-		const user = await User.findOne({ email })
+		let user = await Admin.findOne({ email })
+		let role = 'admin'
+
+		if (!user) {
+			user = await Employee.findOne({ email })
+			role = 'staff'
+		}
+
 		if (!user) {
 			return res
-				.status(400)
-				.json({ message: 'Invalid Credentials, Not Found' })
+				.status(401)
+				.json({ message: 'Invalid credentials or user not found' })
 		}
 
-		// 2. Compare passwords
+		// 2. Compare the password
 		const isMatch = await bcrypt.compare(password, user.password)
 		if (!isMatch) {
-			return res.status(400).send({ message: 'Invalid Credentials' })
+			return res.status(401).json({ message: 'Invalid credentials' })
 		}
 
-		const payload = { email }
+		const payload = { email, role }
 
 		jwt.sign(
 			payload,
