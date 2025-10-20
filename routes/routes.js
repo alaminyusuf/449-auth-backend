@@ -38,5 +38,11 @@ router.post(
 	admin,
 	addminController.paySalaries
 )
+router.post(
+	'/admin/add-employee',
+	protect,
+	admin,
+	authController.addEmployee
+)
 
 module.exports = router

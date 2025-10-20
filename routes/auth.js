@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs')
 const Admin = require('../models/Admin')
+const Employee = require('../models/Employee')
 const jwt = require('jsonwebtoken')
 
 // @route POST /api/auth/register
@@ -70,4 +71,21 @@ exports.login = async (req, res) => {
 	} catch (err) {
 		return res.status(500).json({ message: err.message })
 	}
+}
+
+exports.addEmployee = async (req, res) => {
+	const { name, email, baseSalary, paymentAccount, password } = req.body
+	if (!name || !email || !baseSalary || !paymentAccount || !password) {
+		res.status(400).json({ message: 'Add all fields' })
+	}
+	const data = {
+		name,
+		email,
+		baseSalary,
+		paymentAccount,
+		password,
+	}
+	const newEmployee = new Employee(data)
+	await newEmployee.save()
+	return res.status(201).json({ message: 'Employee Added' })
 }
