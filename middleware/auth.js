@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 
 // Middleware to verify JWT and attach user data to the request
-module.exports = function (req, res, next) {
+const protect = (req, res, next) => {
 	let token
 	// 1. Get token from header
 	// The token is typically sent as 'Bearer TOKEN_STRING'
@@ -33,3 +33,14 @@ module.exports = function (req, res, next) {
 		res.status(401).json({ msg: 'Token is not valid' })
 	}
 }
+
+const admin = (req, res, next) => {
+	// Check if the user attached by 'protect' middleware has the admin role
+	if (req.user && req.user.role === 'admin') {
+		next()
+	} else {
+		res.status(403).json({ message: 'Not authorized as an admin' })
+	}
+}
+
+exports.module = { protect, admin }
