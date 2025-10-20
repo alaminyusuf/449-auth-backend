@@ -65,7 +65,11 @@ exports.login = async (req, res) => {
 			{ expiresIn: '10m' },
 			(err, token) => {
 				if (err) throw err
-				return res.status(201).json({ token, message: 'Login successful' })
+				return res.status(201).json({
+					token,
+					user: { id: user._id, role: user.role },
+					message: 'Login successful',
+				})
 			}
 		)
 	} catch (err) {
@@ -74,18 +78,22 @@ exports.login = async (req, res) => {
 }
 
 exports.addEmployee = async (req, res) => {
-	const { name, email, baseSalary, paymentAccount, password } = req.body
-	if (!name || !email || !baseSalary || !paymentAccount || !password) {
-		res.status(400).json({ message: 'Add all fields' })
+	try {
+		const { name, email, baseSalary, paymentAccount, password } = req.body
+		if (!name || !email || !baseSalary || !paymentAccount || !password) {
+			res.status(400).json({ message: 'Add all fields' })
+		}
+		const data = {
+			name,
+			email,
+			baseSalary,
+			paymentAccount,
+			password,
+		}
+		const newEmployee = new Employee(data)
+		await newEmployee.save()
+		return res.status(201).json({ message: 'Employee Added' })
+	} catch (e) {
+		res.status(500).json({ message: 'Server Error' })
 	}
-	const data = {
-		name,
-		email,
-		baseSalary,
-		paymentAccount,
-		password,
-	}
-	const newEmployee = new Employee(data)
-	await newEmployee.save()
-	return res.status(201).json({ message: 'Employee Added' })
 }
