@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const User = require('../models/User')
+const User = require('../models/Employee')
 const Income = require('../models/Income')
 const Expense = require('../models/Expense')
 

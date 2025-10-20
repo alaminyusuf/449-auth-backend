@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const OTP = require('../models/OTP')
-const User = require('../models/User')
+const User = require('../models/Employee')
 
 // --- Email Transporter Setup ---
 const transporter = nodemailer.createTransport({

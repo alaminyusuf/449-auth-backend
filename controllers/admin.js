@@ -93,5 +93,3 @@ exports.viewPayHistory = async (req, res) => {
 		res.status(500).json({ message: 'Error fetching payroll history.' })
 	}
 }
-
-module.exports = router
