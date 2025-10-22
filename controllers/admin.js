@@ -1,16 +1,11 @@
 const Employee = require('../models/Employee')
 const PaymentRecord = require('../models/Payment')
+const Income = require('../models/Income')
 
 const calculateNetPay = (employee) => {
 	// Basic calculation: Gross Pay = Base Salary + Allowances
-	const grossPay = employee.baseSalary + employee.allowances
-
-	// Deductions = Gross Pay * Tax Rate
-	const deductions = grossPay * employee.taxRate
-
-	const netPay = grossPay - deductions
-
-	return { grossPay, deductions, netPay }
+	const grossPay = employee.baseSalary
+	return { grossPay }
 }
 
 // POST /api/admin/pay-salaries
@@ -47,23 +42,31 @@ exports.paySalaries = async (req, res) => {
 			}
 
 			// 3. Calculate the salary details
-			const { grossPay, deductions, netPay } = calculateNetPay(employee)
+			const { grossPay } = calculateNetPay(employee)
 
 			// 4. MOCK PAYMENT SUCCESS: Create a new payment record in the database
 			const newPayment = new PaymentRecord({
 				employee: employee._id,
 				grossPay,
-				deductions,
-				netPay,
 				paymentCycle,
 				status: 'RECORDED', // Confirms the payment ledger entry
 			})
 
 			await newPayment.save()
 
+			const incomeSource = `Salary Payment for ${paymentCycle}`
+
+			const newIncome = new Income({
+				user: employee._id,
+				amount: grossPay,
+				description: incomeSource,
+			})
+
+			await newIncome.save()
+
 			paymentResults.push({
 				employee: employee.name,
-				netPay,
+				grossPay,
 				status: 'SUCCESS',
 			})
 		}
@@ -73,6 +76,7 @@ exports.paySalaries = async (req, res) => {
 			summary: paymentResults,
 		})
 	} catch (error) {
+		console.log(error)
 		res
 			.status(500)
 			.json({ message: 'Error processing payroll.', error: error.message })

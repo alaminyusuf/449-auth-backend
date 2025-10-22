@@ -7,8 +7,6 @@ const EmployeeSchema = new mongoose.Schema({
 	password: { type: String, required: true }, // NEW FIELD
 	role: { type: String, default: 'staff' }, // NEW FIELD (different from admin)
 	baseSalary: { type: Number, required: true },
-	taxRate: { type: Number, default: 0.1 },
-	allowances: { type: Number, default: 0 },
 	paymentAccount: { type: String, required: true },
 })
 

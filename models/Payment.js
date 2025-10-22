@@ -7,11 +7,8 @@ const PaymentRecordSchema = new mongoose.Schema({
 		required: true,
 	},
 	grossPay: { type: Number, required: true },
-	deductions: { type: Number, required: true },
-	netPay: { type: Number, required: true }, // The final amount "paid"
 	paymentDate: { type: Date, default: Date.now },
-	paymentCycle: { type: String, required: true }, // e.g., "Oct 2025"
-	// Mock status to indicate payment was "processed" in the system
+	paymentCycle: { type: String, required: true },
 	status: { type: String, default: 'RECORDED' },
 })
 
